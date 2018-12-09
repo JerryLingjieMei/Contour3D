@@ -20,16 +20,14 @@ def main(case_id):
     surface = generate_surface()
     height_map = surface.get_surface()
     np.save(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.npy".format(case_id)), np.array(height_map))
-    contours = surface.get_contours(n_contours=20, n_samples=500, sight_angle=53)
-    xl, xr, yl, yr = 1e9, -1e9, 1e9, -1e9
+    contours, depmap, xl, xr, yl, yr = surface.get_contours(n_contours=20, n_samples=500, sight_angle=53)
+    np.save(os.path.join(DEPTHMAP_FOLDER, "{:05d}.npy".format(case_id)), np.array(depmap))
+    #print(depmap)
     plt.clf()
     for contour in contours:
+        contour = [p for p in contour if p[0]>=xl and p[0]<=xr and p[1]>=yl and p[1]<=yr]
         x = np.array([p[0] for p in contour])
         y = np.array([p[1] for p in contour])
-        xl = min(xl, np.amin(x))
-        xr = max(xr, np.amax(x))
-        yl = min(yl, np.amin(y))
-        yr = max(yr, np.amax(y))
         plt.plot(x, y, color='black')
     plt.xlim(xl, xr)
     plt.ylim(yl, yr)
@@ -46,3 +44,4 @@ if __name__ == '__main__':
 
     with Pool(cpu_count()) as p:
         p.starmap(main, worker_args)
+    

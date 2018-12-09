@@ -3,6 +3,7 @@ import os
 DATA_FOLDER = "data"
 CONTOUR_FOLDER = os.path.join(DATA_FOLDER, "contours")
 HEIGHTMAP_FOLDER = os.path.join(DATA_FOLDER, "heightmaps")
+DEPTHMAP_FOLDER = os.path.join(DATA_FOLDER, "depthmaps")
 
 if not os.path.exists(DATA_FOLDER):
     os.mkdir(DATA_FOLDER)
