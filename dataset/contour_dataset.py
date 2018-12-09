@@ -24,9 +24,9 @@ class Contours(Dataset):
 
     def __getitem__(self, item):
         if self.phase == "train":
-            heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item)))
+            heightmap = np.load(os.path.join(DEPTHMAP_FOLDER, "{:05d}.png".format(item)))
             contour = imread(os.path.join(CONTOUR_FOLDER, "{:05d}.png".format(item)))[:, :, 0]
         else:
-            heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item + self.train_length)))
+            heightmap = np.load(os.path.join(DEPTHMAP_FOLDER, "{:05d}.png".format(item + self.train_length)))
             contour = imread(os.path.join(CONTOUR_FOLDER, "{:05d}.png".format(item + self.test_length)))[:, :, 0]
         return heightmap, contour
