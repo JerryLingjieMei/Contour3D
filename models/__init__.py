@@ -13,7 +13,7 @@ def find_model_using_name(model_name):
     # be instantiated. It has to be a subclass of BaseModel,
     # and it is case-insensitive.
     model = None
-    target_model_name = model_name.replace('_', '') + 'models'
+    target_model_name = model_name.replace('_', '') + 'model'
     for name, cls in modellib.__dict__.items():
         if name.lower() == target_model_name.lower() \
            and issubclass(cls, BaseModel):

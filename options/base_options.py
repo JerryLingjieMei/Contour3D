@@ -3,7 +3,7 @@ import os
 from util import util
 import torch
 import models
-import data
+import dataset
 
 
 class BaseOptions():
@@ -12,21 +12,21 @@ class BaseOptions():
 
     def initialize(self, parser):
         parser.add_argument('--dataroot', required=True, help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
-        parser.add_argument('--batch_size', type=int, default=1, help='input batch size')
-        parser.add_argument('--loadSize', type=int, default=286, help='scale images to this size')
-        parser.add_argument('--fineSize', type=int, default=256, help='then crop to this size')
-        parser.add_argument('--display_winsize', type=int, default=256, help='display window size for both visdom and HTML')
+        parser.add_argument('--batch_size', type=int, default=4, help='input batch size')
+        parser.add_argument('--loadSize', type=int, default=512, help='scale images to this size')
+        parser.add_argument('--fineSize', type=int, default=384, help='then crop to this size')
+        parser.add_argument('--display_winsize', type=int, default=384, help='display window size for both visdom and HTML')
         parser.add_argument('--input_nc', type=int, default=3, help='# of input image channels')
-        parser.add_argument('--output_nc', type=int, default=3, help='# of output image channels')
-        parser.add_argument('--ngf', type=int, default=64, help='# of gen filters in first conv layer')
-        parser.add_argument('--ndf', type=int, default=64, help='# of discrim filters in first conv layer')
+        parser.add_argument('--output_nc', type=int, default=1, help='# of output image channels')
+        parser.add_argument('--ngf', type=int, default=128, help='# of gen filters in first conv layer')
+        parser.add_argument('--ndf', type=int, default=128, help='# of discrim filters in first conv layer')
         parser.add_argument('--netD', type=str, default='basic', help='selects models to use for netD')
         parser.add_argument('--netG', type=str, default='resnet_9blocks', help='selects models to use for netG')
-        parser.add_argument('--n_layers_D', type=int, default=3, help='only used if netD==n_layers')
-        parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+        parser.add_argument('--n_layers_D', type=int, default=4, help='only used if netD==n_layers')
+        parser.add_argument('--gpu_ids', type=str, default='0,1,2,3', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
         parser.add_argument('--name', type=str, default='experiment_name', help='name of the experiment. It decides where to store samples and models')
         parser.add_argument('--dataset_mode', type=str, default='unaligned', help='chooses how datasets are loaded. [unaligned | aligned | single]')
-        parser.add_argument('--models', type=str, default='cycle_gan', help='chooses which models to use. cycle_gan, pix2pix, test')
+        parser.add_argument('--model', type=str, default='cycle_gan', help='chooses which models to use. cycle_gan, pix2pix, test')
         parser.add_argument('--direction', type=str, default='AtoB', help='AtoB or BtoA')
         parser.add_argument('--epoch', type=str, default='latest', help='which epoch to load? set to latest to use latest cached models')
         parser.add_argument('--load_iter', type=int, default='0', help='which iteration to load? if load_iter > 0, the code will load models by iter_[load_iter]; otherwise, the code will load models by [epoch]')
@@ -63,7 +63,7 @@ class BaseOptions():
 
         # modify dataset-related parser options
         dataset_name = opt.dataset_mode
-        dataset_option_setter = data.get_option_setter(dataset_name)
+        dataset_option_setter = dataset.get_option_setter(dataset_name)
         parser = dataset_option_setter(parser, self.isTrain)
 
         self.parser = parser

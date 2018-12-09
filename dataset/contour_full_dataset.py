@@ -18,9 +18,9 @@ class ContourDataset(BaseDataset):
 
     def __init__(self):
         self.is_train = None
-        self.contour_folder = CONTOUR_CONTOUR_FOLDER
+        self.contour_folder = FULL_CONTOUR_FOLDER
         self.data_folder = DATA_FOLDER
-        self.train_length = 10000
+        self.train_length = 40000
         self.test_length = 2000
 
     def __len__(self):
@@ -45,13 +45,13 @@ class ContourDataset(BaseDataset):
 
     def __getitem__(self, item):
         if self.is_train:
-            depthmap = np.load(os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(item)))
+            depthmap = np.load(os.path.join(FULL_DEPTHMAP_FOLDER, "{:05d}.npy".format(item)))
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item)))
-            contour = imread(os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(item)))
+            contour = imread(os.path.join(FULL_CONTOUR_FOLDER, "{:05d}.png".format(item)))
         else:
-            depthmap = np.load(os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(item + self.train_length)))
+            depthmap = np.load(os.path.join(FULL_DEPTHMAP_FOLDER, "{:05d}.npy".format(item + self.train_length)))
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item + self.train_length)))
-            contour = (os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(item + self.train_length)))
+            contour = (os.path.join(FULL_CONTOUR_FOLDER, "{:05d}.png".format(item + self.train_length)))
         depthmap = np.rot90(depthmap) / 320
         depthmap = np.expand_dims(depthmap, 2)
         depthmap = np.array(depthmap, dtype=np.float)
