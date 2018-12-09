@@ -34,5 +34,5 @@ def ring():
 def generate_surface():
     random.seed()
     n_shapes = random.randint(3, 6)
-    basic_shapes = [sinusoid_wave, spherical_cap, ring]
+    basic_shapes = [sinusoid_wave, spherical_cap, spherical_cap, ring, ring, ring]
     return Surface([random.choice(basic_shapes)() for _ in range(n_shapes)], size=(SURFACE_SIZE, SURFACE_SIZE))
