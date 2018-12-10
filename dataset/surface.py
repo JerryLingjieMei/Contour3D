@@ -37,7 +37,7 @@ class Surface:
                         np.stack((np.zeros(shape), np.full(shape, DELTA), self.get_height(x, y + DELTA) - z), axis=-1))
 
     def get_surface(self):
-        return self.z
+        return self.get_height(self.x,self.y)
 
     def get_contours(self, n_contours=10, n_samples=1000, sight_angle=45):
         perspective = normalize(np.array([1, 1, -math.tan(sight_angle / 180 * math.pi)]))
@@ -102,10 +102,11 @@ class Surface:
                     now.append((gx, gy))
                     if bid>=0 and bid<=BUCKET_SIZE*2:
                         buckets[bid] = float(gy)
-                        depx = to_index_range((gx - xl) / (xr - xl), DEPTHMAP_SIZE)
-                        depy = to_index_range((gy - yl) / (yr - yl), DEPTHMAP_SIZE)
-                        depsum[depx][depy] += dep
-                        depcnt[depx][depy] += 1
+                        if 0<=x<=SURFACE_SIZE and 0<=y<=SURFACE_SIZE:
+                            depx = to_index_range((gx-xl)/(xr-xl), DEPTHMAP_SIZE)
+                            depy = to_index_range((gy-yl)/(yr-yl), DEPTHMAP_SIZE)
+                            depsum[depx][depy] += dep
+                            depcnt[depx][depy] += 1
                 elif len(now) != 0:
                     res.append(now)
                     now = []
