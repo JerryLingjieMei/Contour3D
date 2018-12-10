@@ -8,7 +8,7 @@ from util.utils import DATA_FOLDER, CONTOUR_CONTOUR_FOLDER, CONTOUR_DEPTHMAP_FOL
 from dataset.base_dataset import BaseDataset
 
 
-class ContourDataset(BaseDataset):
+class ContourFullDataset(BaseDataset):
     @staticmethod
     def modify_commandline_options(parser, is_train):
         return parser
@@ -45,24 +45,26 @@ class ContourDataset(BaseDataset):
 
     def __getitem__(self, item):
         if self.is_train:
-            depthmap = np.load(os.path.join(FULL_DEPTHMAP_FOLDER, "{:05d}.npy".format(item)))
+            depth_path = os.path.join(FULL_DEPTHMAP_FOLDER, "{:05d}.npy".format(item))
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item)))
-            contour = imread(os.path.join(FULL_CONTOUR_FOLDER, "{:05d}.png".format(item)))
+            contour_path = os.path.join(FULL_CONTOUR_FOLDER, "{:05d}.png".format(item))
         else:
-            depthmap = np.load(os.path.join(FULL_DEPTHMAP_FOLDER, "{:05d}.npy".format(item + self.train_length)))
+            depth_path = os.path.join(FULL_DEPTHMAP_FOLDER, "{:05d}.npy".format(item + self.train_length))
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item + self.train_length)))
-            contour = (os.path.join(FULL_CONTOUR_FOLDER, "{:05d}.png".format(item + self.train_length)))
-        depthmap = np.rot90(depthmap) / 320
+            contour_path = os.path.join(FULL_CONTOUR_FOLDER, "{:05d}.png".format(item + self.train_length))
+        contour = imread(contour_path)
+        depthmap = np.load(depth_path)
+        depthmap = np.rot90(depthmap) / 500.
         depthmap = np.expand_dims(depthmap, 2)
         depthmap = np.array(depthmap, dtype=np.float)
         contour = contour[:, :, 0:3]
-        contour, depthmap = self.transform(contour, depthmap)
         xs, ys = np.meshgrid(np.arange(0, 1, 1 / contour.shape[0]), np.arange(0, 1, 1 / contour.shape[1]))
         contour[:, :, 1] = xs
         contour[:, :, 2] = ys
+        contour, depthmap = self.transform(contour, depthmap)
         contour = contour.float()
         depthmap = depthmap.float()
-        return dict(A=contour, B=depthmap, A_paths=CONTOUR_CONTOUR_FOLDER, B_paths=CONTOUR_DEPTHMAP_FOLDER)
+        return dict(A=contour, B=depthmap, A_paths=contour_path, B_paths=depth_path)
 
     def name(self):
-        return 'ContourDataset'
+        return 'ContourFullDataset'

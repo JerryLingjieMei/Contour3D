@@ -76,6 +76,7 @@ class BaseModel():
         for name in self.visual_names:
             if isinstance(name, str):
                 visual_ret[name] = getattr(self, name)
+        visual_ret["path"] = self.image_paths
         return visual_ret
 
     # return traning losses/errors. train.py will print out these errors as debugging information
@@ -109,7 +110,7 @@ class BaseModel():
                 if getattr(module, key) is None:
                     state_dict.pop('.'.join(keys))
             if module.__class__.__name__.startswith('InstanceNorm') and \
-               (key == 'num_batches_tracked'):
+                    (key == 'num_batches_tracked'):
                 state_dict.pop('.'.join(keys))
         else:
             self.__patch_instance_norm_state_dict(state_dict, getattr(module, key), keys, i + 1)

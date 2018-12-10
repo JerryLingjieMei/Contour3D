@@ -1,1 +1,1 @@
-python3 dataset/plot_surface.py --start_index=0 --end_index=12000 --stride=1
+python3 dataset/plot_surface_full.py --start_index=0 --end_index=12000 --stride=1

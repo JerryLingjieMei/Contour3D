@@ -23,6 +23,8 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
     ims, txts, links = [], [], []
 
     for label, im_data in visuals.items():
+        if label == "path":
+            continue
         im = util.tensor2im(im_data)
         image_name = '%s_%s.png' % (name, label)
         save_path = os.path.join(image_dir, image_name)
@@ -50,7 +52,8 @@ class Visualizer():
         if self.display_id > 0:
             import visdom
             self.ncols = opt.display_ncols
-            self.vis = visdom.Visdom(server=opt.display_server, port=opt.display_port, env=opt.display_env, raise_exceptions=True)
+            self.vis = visdom.Visdom(server=opt.display_server, port=opt.display_port, env=opt.display_env,
+                                     raise_exceptions=True)
 
         if self.use_html:
             self.web_dir = os.path.join(opt.checkpoints_dir, opt.name, 'web')
@@ -66,7 +69,8 @@ class Visualizer():
         self.saved = False
 
     def throw_visdom_connection_error(self):
-        print('\n\nCould not connect to Visdom server (https://github.com/facebookresearch/visdom) for displaying training progress.\nYou can suppress connection to Visdom using the option --display_id -1. To install visdom, run \n$ pip install visdom\n, and start the server by \n$ python -m visdom.server.\n\n')
+        print(
+            '\n\nCould not connect to Visdom server (https://github.com/facebookresearch/visdom) for displaying training progress.\nYou can suppress connection to Visdom using the option --display_id -1. To install visdom, run \n$ pip install visdom\n, and start the server by \n$ python -m visdom.server.\n\n')
         exit(1)
 
     # |visuals|: dictionary of images to display or save
@@ -85,7 +89,10 @@ class Visualizer():
                 label_html_row = ''
                 images = []
                 idx = 0
+                print(visuals["path"])
                 for label, image in visuals.items():
+                    if label == "path":
+                        continue
                     image_numpy = util.tensor2im(image)
                     label_html_row += '<td>%s</td>' % label
                     images.append(image_numpy.transpose([2, 0, 1]))
@@ -113,6 +120,8 @@ class Visualizer():
             else:
                 idx = 1
                 for label, image in visuals.items():
+                    if label == "path":
+                        continue
                     image_numpy = util.tensor2im(image)
                     self.vis.image(image_numpy.transpose([2, 0, 1]), opts=dict(title=label),
                                    win=self.display_id + idx)
@@ -121,6 +130,8 @@ class Visualizer():
         if self.use_html and (save_result or not self.saved):  # save images to a html file
             self.saved = True
             for label, image in visuals.items():
+                if label == "path":
+                    continue
                 image_numpy = util.tensor2im(image)
                 img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.png' % (epoch, label))
                 util.save_image(image_numpy, img_path)
@@ -131,6 +142,8 @@ class Visualizer():
                 ims, txts, links = [], [], []
 
                 for label, image_numpy in visuals.items():
+                    if label =="path":
+                        continue
                     image_numpy = util.tensor2im(image)
                     img_path = 'epoch%.3d_%s.png' % (n, label)
                     ims.append(img_path)

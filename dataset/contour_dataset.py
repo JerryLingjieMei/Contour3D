@@ -20,7 +20,7 @@ class ContourDataset(BaseDataset):
         self.is_train = None
         self.contour_folder = CONTOUR_CONTOUR_FOLDER
         self.data_folder = DATA_FOLDER
-        self.train_length = 10000
+        self.train_length = 20000
         self.test_length = 2000
 
     def __len__(self):
@@ -45,14 +45,16 @@ class ContourDataset(BaseDataset):
 
     def __getitem__(self, item):
         if self.is_train:
-            depthmap = np.load(os.path.join(DATA_FOLDER, "depthmaps", "{:05d}.npy".format(item)))
+            depth_path = os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(item))
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item)))
-            contour = imread(os.path.join(DATA_FOLDER, "contours", "{:05d}.png".format(item)))
+            contour_path = os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(item))
         else:
-            depthmap = np.load(os.path.join(DATA_FOLDER, "depthmaps", "{:05d}.npy".format(item + self.train_length)))
+            depth_path = os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(item + self.train_length))
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item + self.train_length)))
-            contour = (os.path.join(DATA_FOLDER, "contours", "{:05d}.png".format(item + self.train_length)))
-        depthmap = np.rot90(depthmap) / 320
+            contour_path = os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(item + self.train_length))
+        contour = imread(contour_path)
+        depthmap = np.load(depth_path)
+        depthmap = np.rot90(depthmap) / 500.
         depthmap = np.expand_dims(depthmap, 2)
         depthmap = np.array(depthmap, dtype=np.float)
         contour = contour[:, :, 0:3]
@@ -62,7 +64,7 @@ class ContourDataset(BaseDataset):
         contour, depthmap = self.transform(contour, depthmap)
         contour = contour.float()
         depthmap = depthmap.float()
-        return dict(A=contour, B=depthmap, A_paths=CONTOUR_CONTOUR_FOLDER, B_paths=CONTOUR_DEPTHMAP_FOLDER)
+        return dict(A=contour, B=depthmap, A_paths=contour_path, B_paths=depth_path)
 
     def name(self):
         return 'ContourDataset'
