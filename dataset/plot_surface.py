@@ -21,7 +21,7 @@ def main(case_id):
     surface = generate_surface()
     height_map = surface.get_surface()
     np.save(os.path.join(CONTOUR_HEIGHTMAP_FOLDER, "{:05d}.npy".format(case_id)), np.array(height_map))
-    contours, depmap, xl, xr, yl, yr = surface.get_contours(n_contours=20, n_samples=1000, sight_angle=53)
+    contours, depmap, xl, xr, yl, yr = surface.get_contours(n_contours=20, n_samples=1000, sight_angle=DEFAULT_SIGHT_ANGLE)
     np.save(os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(case_id)), np.array(depmap))
     plt.clf()
     fig = plt.figure()
