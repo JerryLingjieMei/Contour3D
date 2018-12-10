@@ -28,6 +28,7 @@ class Surface:
         for f in self.basics:
             h += f(x, y)
         h *= ratio
+        #return np.zeros(h.shape)
         return h
 
     def normal_vector(self, x, y, z):
@@ -53,37 +54,43 @@ class Surface:
 
         depsum = np.zeros([DEPTHMAP_SIZE, DEPTHMAP_SIZE])
         depcnt = np.zeros([DEPTHMAP_SIZE, DEPTHMAP_SIZE])
-
-        n_buckets = n_samples * 10
-        buckets = [-1e9] * (n_buckets + 1)
-
-        half_contours = (n_contours + 1) // 2
+        
+        buckets = [-1e9] * (BUCKET_SIZE*2+1 + 1)
+        
+        half_contours = (n_contours+1)//2
         for k in range(-half_contours, n_contours + half_contours + 1, 1):
+            last_x = SURFACE_SIZE / (n_contours - 1) * (k - 1)
+            current_x = SURFACE_SIZE / (n_contours - 1) * k
             if k > 0 and k < n_contours:
-                n_in_gap = max(1, 1000 // n_contours)
-                for i in range(n_in_gap):
-                    xs = np.full((n_samples,),
-                                 SURFACE_SIZE / (n_contours - 1) * (k - 1) + SURFACE_SIZE / (n_contours - 1) / (
-                                         n_in_gap + 1) * (i + 1))
-                    ys = np.arange(0, n_samples, 1) * (SURFACE_SIZE * 2 / (n_samples - 1)) - SURFACE_SIZE / 2
+                gap_l = max(math.ceil(last_x / SURFACE_SIZE * BUCKET_SIZE),0)
+                gap_r = min(math.ceil(current_x / SURFACE_SIZE * BUCKET_SIZE)-1,BUCKET_SIZE)
+                #print(gap_l/ BUCKET_SIZE * SURFACE_SIZE,gap_r/ BUCKET_SIZE * SURFACE_SIZE)
+                for i in range(gap_l, gap_r + 1):
+                    xi = np.full((BUCKET_SIZE+1,), i)
+                    yi = np.arange(0, BUCKET_SIZE+1, 1)
+                    xs = xi / BUCKET_SIZE * SURFACE_SIZE
+                    ys = yi / BUCKET_SIZE * SURFACE_SIZE
                     zs = self.get_height(xs, ys)
-                    bids = np.round((xs - ys + SURFACE_SIZE) / (2 * SURFACE_SIZE) * n_buckets).astype(int)
+                    bids = xi - yi + BUCKET_SIZE
                     for x, y, z, bid in zip(xs, ys, zs, bids):
                         p = np.array([x, y, z])
                         gx = float(np.inner(p, px))
                         gy = float(np.inner(p, py))
                         dep = float(np.inner(p, perspective))
-                        if 0 <= bid < n_buckets and gy > buckets[bid]:
+                        if bid < 0 or bid > BUCKET_SIZE*2:
+                            raise ValueError
+                        if gy > buckets[bid]:
                             buckets[bid] = gy
                             depx = to_index_range((gx - xl) / (xr - xl), DEPTHMAP_SIZE)
                             depy = to_index_range((gy - yl) / (yr - yl), DEPTHMAP_SIZE)
                             depsum[depx][depy] += dep
                             depcnt[depx][depy] += 1
-            xs = np.full((n_samples,), SURFACE_SIZE / (n_contours - 1) * k)
+            #print(current_x)
+            xs = np.full((n_samples,), current_x)
             ys = np.arange(0, n_samples, 1) * (SURFACE_SIZE * 2 / (n_samples - 1)) - SURFACE_SIZE / 2
             zs = self.get_height(xs, ys)
             nvs = self.normal_vector(xs, ys, zs)
-            bids = np.round((xs - ys + SURFACE_SIZE) / (2 * SURFACE_SIZE) * n_buckets).astype(int)
+            bids = np.ceil((xs - ys) / SURFACE_SIZE * BUCKET_SIZE).astype(int) + BUCKET_SIZE
             for x, y, z, nv, bid in zip(xs, ys, zs, nvs, bids):
                 if x + y < 0 or x + y > SURFACE_SIZE * 2 or x - y > SURFACE_SIZE or x - y < -SURFACE_SIZE:
                     continue
@@ -91,9 +98,9 @@ class Surface:
                 gx = float(np.inner(p, px))
                 gy = float(np.inner(p, py))
                 dep = float(np.inner(p, perspective))
-                if np.inner(perspective, nv) < 0 and (bid < 0 or bid > n_buckets or gy > buckets[bid]):
+                if np.inner(perspective, nv) < 0 and (bid<0 or bid>BUCKET_SIZE*2 or gy > buckets[bid]):
                     now.append((gx, gy))
-                    if bid >= 0 and bid <= n_buckets:
+                    if bid>=0 and bid<=BUCKET_SIZE*2:
                         buckets[bid] = float(gy)
                         depx = to_index_range((gx - xl) / (xr - xl), DEPTHMAP_SIZE)
                         depy = to_index_range((gy - yl) / (yr - yl), DEPTHMAP_SIZE)
