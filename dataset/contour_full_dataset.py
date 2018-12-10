@@ -20,7 +20,7 @@ class ContourDataset(BaseDataset):
         self.is_train = None
         self.contour_folder = FULL_CONTOUR_FOLDER
         self.data_folder = DATA_FOLDER
-        self.train_length = 40000
+        self.train_length = 20000
         self.test_length = 2000
 
     def __len__(self):
