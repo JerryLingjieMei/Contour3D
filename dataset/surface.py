@@ -64,7 +64,7 @@ class Surface:
                     xs = np.full((n_samples,),
                                  SURFACE_SIZE / (n_contours - 1) * (k - 1) + SURFACE_SIZE / (n_contours - 1) / (
                                          n_in_gap + 1) * (i + 1))
-                    ys = np.arange(0, n_samples, 1) * SURFACE_SIZE / (n_samples - 1)
+                    ys = np.arange(0, n_samples, 1) * (SURFACE_SIZE * 2 / (n_samples - 1)) - SURFACE_SIZE / 2
                     zs = self.get_height(xs, ys)
                     bids = np.round((xs - ys + SURFACE_SIZE) / (2 * SURFACE_SIZE) * n_buckets).astype(int)
                     for x, y, z, bid in zip(xs, ys, zs, bids):
@@ -72,7 +72,7 @@ class Surface:
                         gx = float(np.inner(p, px))
                         gy = float(np.inner(p, py))
                         dep = float(np.inner(p, perspective))
-                        if gy > buckets[bid]:
+                        if 0 <= bid < n_buckets and gy > buckets[bid]:
                             buckets[bid] = gy
                             depx = to_index_range((gx-xl)/(xr-xl), DEPTHMAP_SIZE)
                             depy = to_index_range((gy-yl)/(yr-yl), DEPTHMAP_SIZE)
