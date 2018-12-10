@@ -45,21 +45,21 @@ class ContourDataset(BaseDataset):
 
     def __getitem__(self, item):
         if self.is_train:
-            depthmap = np.load(os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(item)))
+            depthmap = np.load(os.path.join(DATA_FOLDER, "depthmaps", "{:05d}.npy".format(item)))
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item)))
-            contour = imread(os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(item)))
+            contour = imread(os.path.join(DATA_FOLDER, "contours", "{:05d}.png".format(item)))
         else:
-            depthmap = np.load(os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(item + self.train_length)))
+            depthmap = np.load(os.path.join(DATA_FOLDER, "depthmaps", "{:05d}.npy".format(item + self.train_length)))
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item + self.train_length)))
-            contour = (os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(item + self.train_length)))
+            contour = (os.path.join(DATA_FOLDER, "contours", "{:05d}.png".format(item + self.train_length)))
         depthmap = np.rot90(depthmap) / 320
         depthmap = np.expand_dims(depthmap, 2)
         depthmap = np.array(depthmap, dtype=np.float)
         contour = contour[:, :, 0:3]
-        contour, depthmap = self.transform(contour, depthmap)
         xs, ys = np.meshgrid(np.arange(0, 1, 1 / contour.shape[0]), np.arange(0, 1, 1 / contour.shape[1]))
         contour[:, :, 1] = xs
         contour[:, :, 2] = ys
+        contour, depthmap = self.transform(contour, depthmap)
         contour = contour.float()
         depthmap = depthmap.float()
         return dict(A=contour, B=depthmap, A_paths=CONTOUR_CONTOUR_FOLDER, B_paths=CONTOUR_DEPTHMAP_FOLDER)
