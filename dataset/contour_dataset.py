@@ -33,7 +33,7 @@ class ContourDataset(BaseDataset):
         contour = TF.to_pil_image(contour)
         contour = TF.center_crop(contour, [512, 512])
 
-        i, j, k, l = transforms.RandomCrop.get_params(contour, output_size=(256, 256))
+        i, j, k, l = transforms.RandomCrop.get_params(contour, output_size=(384, 384))
         contour = TF.crop(contour, i, j, k, l)
         depthmap = depthmap[i:i + k, j:j + l, :]
 

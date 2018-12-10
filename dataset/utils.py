@@ -27,15 +27,17 @@ RING_SIGMA_MAX = .8
 def normalize(x):
     return x / np.linalg.norm(x)
 
+
 def clip_int(x):
     return int(min(x, SURFACE_SIZE - 1))
 
+
 def to_index_range(x, n):
-    return max(0,min(n-1,math.floor(x*n)))
+    return max(0, min(n - 1, math.floor(x * n)))
+
 
 def margin_cut_function(x):
-    margin = SURFACE_SIZE/4
-    alpha = np.minimum(np.maximum(np.minimum(x, SURFACE_SIZE-x), 0), margin)
-    theta = (alpha/margin-.5)*math.pi
-    #return np.zeros(x.shape)
-    return (np.sin(theta)+1)/2
+    margin = SURFACE_SIZE / 4
+    alpha = np.minimum(np.maximum(np.minimum(x, SURFACE_SIZE - x), 0), margin)
+    theta = (alpha / margin - .5) * math.pi
+    return (np.sin(theta) + 1) / 2
