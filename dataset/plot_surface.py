@@ -24,7 +24,6 @@ def main(case_id):
     contours, depmap, xl, xr, yl, yr = surface.get_contours(n_contours=20, n_samples=1000,
                                                             sight_angle=DEFAULT_SIGHT_ANGLE)
     np.save(os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(case_id)), np.array(depmap))
-    plt.clf()
     fig = plt.figure()
     DPI = fig.get_dpi()
     fig.set_size_inches(512 / float(DPI), 512 / float(DPI))
@@ -40,11 +39,8 @@ def main(case_id):
     ax.axes.get_xaxis().set_visible(False)
     ax.axes.get_yaxis().set_visible(False)
     ax.set_frame_on(False)
-    fig.subplots_adjust(bottom=0)
-    fig.subplots_adjust(top=1)
-    fig.subplots_adjust(right=1)
-    fig.subplots_adjust(left=0)
     plt.savefig(os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(case_id)), bbox_inches='tight', pad_inches=0)
+    plt.close()
     print("{:05d} generated".format(case_id))
 
 

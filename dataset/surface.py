@@ -75,10 +75,11 @@ class Surface:
                         dep = float(np.inner(p, perspective))
                         if 0 <= bid < n_buckets and gy > buckets[bid]:
                             buckets[bid] = gy
-                            depx = to_index_range((gx - xl) / (xr - xl), DEPTHMAP_SIZE)
-                            depy = to_index_range((gy - yl) / (yr - yl), DEPTHMAP_SIZE)
-                            depsum[depx][depy] += dep
-                            depcnt[depx][depy] += 1
+                            if 0 <= x <= SURFACE_SIZE and 0 <= y <= SURFACE_SIZE:
+                                depx = to_index_range((gx - xl) / (xr - xl), DEPTHMAP_SIZE)
+                                depy = to_index_range((gy - yl) / (yr - yl), DEPTHMAP_SIZE)
+                                depsum[depx][depy] += dep
+                                depcnt[depx][depy] += 1
             xs = np.full((n_samples,), SURFACE_SIZE / (n_contours - 1) * k)
             ys = np.arange(0, n_samples, 1) * (SURFACE_SIZE * 2 / (n_samples - 1)) - SURFACE_SIZE / 2
             zs = self.get_height(xs, ys)
@@ -95,10 +96,11 @@ class Surface:
                     now.append((gx, gy))
                     if 0 <= bid <= n_buckets:
                         buckets[bid] = float(gy)
-                        depx = to_index_range((gx - xl) / (xr - xl), DEPTHMAP_SIZE)
-                        depy = to_index_range((gy - yl) / (yr - yl), DEPTHMAP_SIZE)
-                        depsum[depx][depy] += dep
-                        depcnt[depx][depy] += 1
+                        if 0 <= x <= SURFACE_SIZE and 0 <= y <= SURFACE_SIZE:
+                            depx = to_index_range((gx - xl) / (xr - xl), DEPTHMAP_SIZE)
+                            depy = to_index_range((gy - yl) / (yr - yl), DEPTHMAP_SIZE)
+                            depsum[depx][depy] += dep
+                            depcnt[depx][depy] += 1
                 elif len(now) != 0:
                     res.append(now)
                     now = []
