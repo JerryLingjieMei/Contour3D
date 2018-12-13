@@ -29,7 +29,7 @@ class ContourDataset(BaseDataset):
         if self.is_train:
             return self.train_length
         else:
-            return self.test_length
+            return self.test_length * 4
 
     def transform(self, contour, depthmap):
         if self.is_train:
@@ -54,9 +54,9 @@ class ContourDataset(BaseDataset):
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item)))
             contour_path = os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(item))
         else:
-            depth_path = os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(item + self.train_length))
+            depth_path = os.path.join(CONTOUR_DEPTHMAP_FOLDER, "{:05d}.npy".format(item // 4 + self.train_length))
             # heightmap = np.load(os.path.join(HEIGHTMAP_FOLDER, "{:05d}.png".format(item + self.train_length)))
-            contour_path = os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(item + self.train_length))
+            contour_path = os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(item // 4 + self.train_length))
         contour = imread(contour_path)
         depthmap = np.load(depth_path)
         depthmap = np.rot90(depthmap) / 500.
@@ -70,8 +70,7 @@ class ContourDataset(BaseDataset):
         contour, depthmap = self.transform(contour, depthmap)
         contour = contour.float()
         depthmap = depthmap.float()
-        if not self.is_train:
-            self.cycle = (self.cycle + 1) % 4
+        self.cycle = (self.cycle + 1) % 4
         return dict(A=contour, B=depthmap, A_paths=contour_path, B_paths=depth_path)
 
     def name(self):

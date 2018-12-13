@@ -16,7 +16,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def plot_depthmap(depthmap, sight_angle, save_fig):
+def plot_depthmap(depthmap, sight_angle, angle,save_fig):
     perspective = normalize(np.array([1, 1, -math.tan(sight_angle / 180 * math.pi)]))
     px = normalize(np.cross(perspective, np.array([0, 0, 1])))
     py = normalize(np.cross(px, perspective))
@@ -56,6 +56,7 @@ def plot_depthmap(depthmap, sight_angle, save_fig):
     ax.set_zlim(-1.01, 1.01)
     ax.zaxis.set_major_locator(LinearLocator(10))
     ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    ax.view_init(azim=angle)
 
     # Add a color bar which maps values to colors.
     fig.colorbar(surf, shrink=0.5, aspect=5)
