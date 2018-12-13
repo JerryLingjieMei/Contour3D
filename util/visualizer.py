@@ -23,8 +23,6 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
     ims, txts, links = [], [], []
 
     for label, im_data in visuals.items():
-        if label == "path":
-            continue
         im = util.tensor2im(im_data)
         image_name = '%s_%s.png' % (name, label)
         save_path = os.path.join(image_dir, image_name)
@@ -89,10 +87,7 @@ class Visualizer():
                 label_html_row = ''
                 images = []
                 idx = 0
-                print(visuals["path"])
                 for label, image in visuals.items():
-                    if label == "path":
-                        continue
                     image_numpy = util.tensor2im(image)
                     label_html_row += '<td>%s</td>' % label
                     images.append(image_numpy.transpose([2, 0, 1]))
@@ -120,8 +115,6 @@ class Visualizer():
             else:
                 idx = 1
                 for label, image in visuals.items():
-                    if label == "path":
-                        continue
                     image_numpy = util.tensor2im(image)
                     self.vis.image(image_numpy.transpose([2, 0, 1]), opts=dict(title=label),
                                    win=self.display_id + idx)
@@ -130,8 +123,6 @@ class Visualizer():
         if self.use_html and (save_result or not self.saved):  # save images to a html file
             self.saved = True
             for label, image in visuals.items():
-                if label == "path":
-                    continue
                 image_numpy = util.tensor2im(image)
                 img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.png' % (epoch, label))
                 util.save_image(image_numpy, img_path)
@@ -142,8 +133,6 @@ class Visualizer():
                 ims, txts, links = [], [], []
 
                 for label, image_numpy in visuals.items():
-                    if label =="path":
-                        continue
                     image_numpy = util.tensor2im(image)
                     img_path = 'epoch%.3d_%s.png' % (n, label)
                     ims.append(img_path)

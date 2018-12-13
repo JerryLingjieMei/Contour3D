@@ -17,18 +17,18 @@ def parse_args():
 
 
 def main(case_id):
-    np.random.seed()
+    np.random.seed(case_id)
     surface = generate_surface()
     height_map = surface.get_surface()
     np.save(os.path.join(FULL_HEIGHTMAP_FOLDER, "{:05d}.npy".format(case_id)), np.array(height_map))
     contours, depmap, xl, xr, yl, yr = surface.get_contours(n_contours=np.random.randint(15, 25), n_samples=1000,
-                                                            sight_angle=np.random.rand() * 50 + 20)
+                                                            sight_angle=DEFAULT_SIGHT_ANGLE)
     np.save(os.path.join(FULL_DEPTHMAP_FOLDER, "{:05d}.npy".format(case_id)), np.array(depmap))
     fig = plt.figure()
     DPI = fig.get_dpi()
     fig.set_size_inches(512 / float(DPI), 512 / float(DPI))
     for contour in contours:
-        contour = [p for p in contour if p[0] >= xl and p[0] <= xr and p[1] >= yl and p[1] <= yr]
+        contour = [p for p in contour if xl <= p[0] <= xr and yl <= p[1] <= yr]
         x = np.array([p[0] for p in contour])
         y = np.array([p[1] for p in contour])
         plt.plot(x, y, color='black')

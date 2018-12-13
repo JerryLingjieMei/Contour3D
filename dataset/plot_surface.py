@@ -17,7 +17,7 @@ def parse_args():
 
 
 def main(case_id):
-    np.random.seed()
+    np.random.seed(case_id)
     surface = generate_surface()
     height_map = surface.get_surface()
     np.save(os.path.join(CONTOUR_HEIGHTMAP_FOLDER, "{:05d}.npy".format(case_id)), np.array(height_map))
@@ -28,7 +28,7 @@ def main(case_id):
     DPI = fig.get_dpi()
     fig.set_size_inches(512 / float(DPI), 512 / float(DPI))
     for contour in contours:
-        contour = [p for p in contour if p[0] >= xl and p[0] <= xr and p[1] >= yl and p[1] <= yr]
+        contour = [p for p in contour if xl <= p[0] <= xr and yl <= p[1] <= yr]
         x = np.array([p[0] for p in contour])
         y = np.array([p[1] for p in contour])
         plt.plot(x, y, color='black')
@@ -39,6 +39,10 @@ def main(case_id):
     ax.axes.get_xaxis().set_visible(False)
     ax.axes.get_yaxis().set_visible(False)
     ax.set_frame_on(False)
+    fig.subplots_adjust(bottom=0)
+    fig.subplots_adjust(top=1)
+    fig.subplots_adjust(right=1)
+    fig.subplots_adjust(left=0)
     plt.savefig(os.path.join(CONTOUR_CONTOUR_FOLDER, "{:05d}.png".format(case_id)), bbox_inches='tight', pad_inches=0)
     plt.close()
     print("{:05d} generated".format(case_id))
